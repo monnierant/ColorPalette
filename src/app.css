@@ -1,0 +1,349 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #0f0f11;
+  --surface: #18181b;
+  --border: #27272a;
+  --text: #e4e4e7;
+  --muted: #71717a;
+  --accent: #7c6fff;
+  --accent-hover: #9d94ff;
+  --radius: 10px;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 16px;
+  color: var(--text);
+  background: var(--bg);
+}
+
+body {
+  min-height: 100vh;
+}
+
+/* ── Layout ── */
+
+.app {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+header {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+header h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+header p {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+section h2 {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+/* ── Uploader ── */
+
+.uploader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  height: 150px;
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  color: var(--muted);
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+  user-select: none;
+}
+
+.uploader:hover,
+.uploader.dragging {
+  border-color: var(--accent);
+  color: var(--text);
+  background: color-mix(in srgb, var(--accent) 5%, transparent);
+}
+
+.uploader span {
+  font-size: 0.9rem;
+}
+
+/* ── Source image preview ── */
+
+.source-image {
+  max-height: 220px;
+  max-width: 100%;
+  border-radius: var(--radius);
+  object-fit: contain;
+  border: 1px solid var(--border);
+}
+
+/* ── Sort buttons ── */
+
+.sort-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.sort-group {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.sort-group-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted, #888);
+  margin-right: 0.15rem;
+}
+
+.sort-controls button {
+  padding: 0.35rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-family: inherit;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.sort-controls button:hover {
+  border-color: var(--accent-hover);
+}
+
+.sort-controls button.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* ── Color grid ── */
+
+.color-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.swatch {
+  width: 38px;
+  height: 38px;
+  border-radius: 6px;
+  cursor: default;
+  transition: transform 0.12s;
+  position: relative;
+}
+
+.swatch:hover {
+  transform: scale(1.25);
+  z-index: 1;
+}
+
+/* ── Palette canvas ── */
+
+.palette-layout-toggle {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.palette-layout-toggle button {
+  padding: 0.3rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-family: inherit;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.palette-layout-toggle button:hover {
+  border-color: var(--accent-hover);
+}
+
+.palette-layout-toggle button.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  font-weight: 600;
+}
+
+.export-btn {
+  margin-left: auto;
+  padding: 0.3rem 0.9rem;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-family: inherit;
+  transition: background 0.15s, color 0.15s;
+}
+
+.export-btn:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+.palette-canvas-wrap {
+  border-radius: var(--radius);
+  overflow-x: auto;
+  overflow-y: hidden;
+  display: block;
+  padding-bottom: 10px;
+}
+
+.palette-canvas {
+  border-radius: var(--radius);
+  display: block;
+  /* image-rendering: pixelated; */
+}
+
+.palette-canvas--strip {
+  width: 100%;
+  height: auto;
+}
+
+/* ── Strip params ── */
+
+.strip-params {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.strip-blend-modes {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.strip-param-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.strip-blend-toggle {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.strip-blend-toggle button {
+  padding: 0.25rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-family: inherit;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.strip-blend-toggle button:hover {
+  border-color: var(--accent-hover);
+}
+
+.strip-blend-toggle button.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.strip-param {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.strip-param span {
+  white-space: nowrap;
+}
+
+.strip-param input[type='number'] {
+  width: 4.5rem;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.82rem;
+  font-family: inherit;
+  text-align: center;
+  transition: border-color 0.15s;
+}
+
+.strip-param input[type='number']::-webkit-inner-spin-button,
+.strip-param input[type='number']::-webkit-outer-spin-button {
+  opacity: 1;
+}
+
+.strip-param input[type='number']:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.strip-param--blend {
+  flex: 1;
+  min-width: 0;
+}
+
+.strip-param input[type='range'] {
+  flex: 1;
+  min-width: 6rem;
+  accent-color: var(--accent);
+  cursor: pointer;
+  height: 4px;
+  border-radius: 999px;
+}
