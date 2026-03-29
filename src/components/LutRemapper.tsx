@@ -1,10 +1,11 @@
-import { createSignal, Show } from "solid-js";
+import { createEffect, createSignal, on, Show } from "solid-js";
 import type { Component } from "solid-js";
 import type { ColorEntry } from "../types/color";
 import { quantizeLut } from "../helpers/lutQuantize";
 
 interface Props {
   palette: ColorEntry[];
+  paletteName: string;
 }
 
 const LutRemapper: Component<Props> = (props) => {
@@ -12,12 +13,35 @@ const LutRemapper: Component<Props> = (props) => {
   const [processing, setProcessing] = createSignal(false);
   const [resultUrl, setResultUrl] = createSignal<string | null>(null);
   const [sourceUrl, setSourceUrl] = createSignal<string | null>(null);
+  const [lutImageData, setLutImageData] = createSignal<ImageData | null>(null);
+  const [lutName, setLutName] = createSignal("");
+
+  const reprocess = (imageData: ImageData) => {
+    setProcessing(true);
+    setResultUrl(null);
+
+    const quantized = quantizeLut(imageData, props.palette);
+
+    const outCanvas = document.createElement("canvas");
+    outCanvas.width = quantized.width;
+    outCanvas.height = quantized.height;
+    const outCtx = outCanvas.getContext("2d")!;
+    outCtx.putImageData(quantized, 0, 0);
+
+    outCanvas.toBlob((blob) => {
+      if (blob) {
+        const prev = resultUrl();
+        if (prev) URL.revokeObjectURL(prev);
+        setResultUrl(URL.createObjectURL(blob));
+      }
+      setProcessing(false);
+    }, "image/png");
+  };
 
   const processFile = (file: File) => {
     const url = URL.createObjectURL(file);
     setSourceUrl(url);
-    setProcessing(true);
-    setResultUrl(null);
+    setLutName(file.name.replace(/\.[^.]+$/, ""));
 
     const img = new Image();
     img.onload = () => {
@@ -27,26 +51,22 @@ const LutRemapper: Component<Props> = (props) => {
       const ctx = canvas.getContext("2d")!;
       ctx.drawImage(img, 0, 0);
       const imageData = ctx.getImageData(0, 0, img.width, img.height);
-
-      const quantized = quantizeLut(imageData, props.palette);
-
-      const outCanvas = document.createElement("canvas");
-      outCanvas.width = quantized.width;
-      outCanvas.height = quantized.height;
-      const outCtx = outCanvas.getContext("2d")!;
-      outCtx.putImageData(quantized, 0, 0);
-
-      outCanvas.toBlob((blob) => {
-        if (blob) {
-          const prev = resultUrl();
-          if (prev) URL.revokeObjectURL(prev);
-          setResultUrl(URL.createObjectURL(blob));
-        }
-        setProcessing(false);
-      }, "image/png");
+      setLutImageData(imageData);
+      reprocess(imageData);
     };
     img.src = url;
   };
+
+  createEffect(
+    on(
+      () => props.palette,
+      () => {
+        const data = lutImageData();
+        if (data) reprocess(data);
+      },
+      { defer: true },
+    ),
+  );
 
   const handleDrop = (e: DragEvent) => {
     e.preventDefault();
@@ -65,7 +85,8 @@ const LutRemapper: Component<Props> = (props) => {
     if (!url) return;
     const a = document.createElement("a");
     a.href = url;
-    a.download = "lut-remapped.png";
+    const name = [props.paletteName, lutName()].filter(Boolean).join("_");
+    a.download = `${name || "lut-remapped"}.png`;
     a.click();
   };
 

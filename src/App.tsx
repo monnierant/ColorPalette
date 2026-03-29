@@ -14,12 +14,18 @@ const App: Component = () => {
   const [colors, setColors] = createSignal<ColorEntry[]>([]);
   const [sortMode, setSortMode] = createSignal<SortMode>("hue");
   const [imageUrl, setImageUrl] = createSignal<string | null>(null);
+  const [paletteName, setPaletteName] = createSignal("");
   const [paletteLayout, setPaletteLayout] = createSignal<PaletteLayout>("grid");
 
   const sorted = createMemo(() => sortColors(colors(), sortMode()));
 
-  const handleImageLoad = (imageData: ImageData, url: string) => {
+  const handleImageLoad = (
+    imageData: ImageData,
+    url: string,
+    fileName: string,
+  ) => {
     setImageUrl(url);
+    setPaletteName(fileName.replace(/\.[^.]+$/, ""));
     setColors(extractColors(imageData));
   };
 
@@ -64,7 +70,7 @@ const App: Component = () => {
 
           <section>
             <h2>Remap a LUT to this palette</h2>
-            <LutRemapper palette={sorted()} />
+            <LutRemapper palette={sorted()} paletteName={paletteName()} />
           </section>
         </Show>
       </main>
