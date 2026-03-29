@@ -347,3 +347,49 @@ section h2 {
   height: 4px;
   border-radius: 999px;
 }
+
+/* ── LUT Remapper ── */
+
+.lut-remapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.lut-status {
+  color: var(--muted);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.lut-preview {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.lut-preview-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.lut-preview-col h3 {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.lut-image {
+  width: 100%;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.lut-download-btn {
+  align-self: flex-start;
+}
